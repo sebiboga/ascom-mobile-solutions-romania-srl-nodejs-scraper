@@ -27,9 +27,9 @@ jobs:
           
       - name: Check for new jobs
         run: |
-          if [ -f jobs.json ]; then
+          if [ -f tmp/jobs.json ]; then
             echo "New jobs found:"
-            cat jobs.json | jq '.jobs | length'
+            cat tmp/jobs.json | jq '.jobs | length'
           else
             echo "No new jobs or scrape failed"
           fi
@@ -40,6 +40,6 @@ jobs:
         with:
           name: scraped-jobs
           path: |
-            jobs.json
-            jobs_existing.json
+            tmp/jobs.json
+            tmp/jobs_existing.json
           retention-days: 7

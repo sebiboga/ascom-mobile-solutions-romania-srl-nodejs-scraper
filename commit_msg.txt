@@ -1,0 +1,3 @@
+Add missing .md files, fix tmp/ paths, fix tests, add .env.local
+
+Closes #1

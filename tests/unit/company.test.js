@@ -7,7 +7,7 @@ jest.unstable_mockModule('node-fetch', () => ({
   default: mockFetch
 }));
 
-const COMPANY_JSON_PATH = 'company.json';
+const COMPANY_JSON_PATH = 'tmp/company.json';
 
 function backupCompanyJson() {
   if (fs.existsSync(COMPANY_JSON_PATH)) {
@@ -103,7 +103,7 @@ describe('company.js', () => {
     it('should return the company brand', () => {
       const brand = company.getCompanyBrand();
       expect(typeof brand).toBe('string');
-      expect(brand).toBe('ASCOM');
+      expect(brand).toBe('ASCOM MOBILE SOLUTIONS');
     });
   });
 
@@ -184,6 +184,7 @@ describe('company.js', () => {
     };
 
     beforeEach(() => {
+      fs.mkdirSync('tmp', { recursive: true });
       fs.writeFileSync(COMPANY_JSON_PATH, JSON.stringify(cachedData), 'utf-8');
     });
 
