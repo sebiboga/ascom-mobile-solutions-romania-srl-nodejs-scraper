@@ -3,6 +3,8 @@ name: Automation Tests
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 7 * * *'
   workflow_dispatch:
 
 jobs:
@@ -14,17 +16,31 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
       - name: Ensure ASCOM exists in company core
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            "https://api.peviitor.ro/v1/company/?cif=38652516" || true
-          echo "Company core check done"
+          FINAL=$(curl -s "https://api.peviitor.ro/v1/company/?cif=38652516" | jq '.total | length')
+          if [ "$FINAL" -ge "1" ]; then
+            echo "✅ SUCCESS: ASCOM is in company core"
+          else
+            echo "❌ FAILED: ASCOM still not in company core"
+            exit 1
+          fi
     timeout-minutes: 2
 
   validate-jobs:
     runs-on: ubuntu-latest
-    needs: ensure-company-core
-    if: ${{ false }}
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    needs: Automation-Tests
     steps:
-      - run: echo "Skipped until SOLR validation is ready"
+      - uses: actions/checkout@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate Ascom jobs in SOLR
+        run: node tests/validate-ascom-jobs.js
+        env:
+          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
 
   Automation-Tests:
     runs-on: ubuntu-latest

@@ -199,6 +199,12 @@ describe('company.js', () => {
   });
 
   describe('validateAndGetCompany', () => {
+    afterEach(() => {
+      if (fs.existsSync(COMPANY_JSON_PATH)) {
+        fs.unlinkSync(COMPANY_JSON_PATH);
+      }
+    });
+
     it('should return company data with status active', async () => {
       mockFetch
         .mockResolvedValueOnce(anafSearchResponse([
